@@ -3,6 +3,8 @@ import express from "express";
 import cors from "cors";
 import {connectDB} from './config/db.js'
 import {notFound,errorHandler} from './middleware/errorHandler.js'
+import authRoutes from "./routes/auth.js";
+
 
 
 const app = express()
@@ -34,9 +36,20 @@ app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
 app.use(express.json({limit: "1mb"}));
 
+
+
+// testing the server
 app.get('/api/health', (req, res) => {
     res.json({status : "ok", time: new Date().toISOString()})
 })
+
+
+
+
+app.use("/api/auth", authRoutes)
+
+
+
 
 app.use(notFound)
 app.use(errorHandler)
@@ -44,6 +57,7 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT;
 
+// show this in vs code terminal
 connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Server is running on port: https:localhost:${PORT}`);
