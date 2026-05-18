@@ -8,6 +8,7 @@ export const connectDB = async () => {
         if(!uri) {
             throw new Error("Mongo URI not found!")
         }
+        console.log(uri);
         const conn = await mongoose.connect(uri);
         console.log(`mongodb database connected : ${conn.connection.host}`);
         
