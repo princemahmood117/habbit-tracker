@@ -161,6 +161,6 @@ const reorderHabits = async (req, res) => {
     }
 }
 
-//habit controller done
+//habit controller
 
 
