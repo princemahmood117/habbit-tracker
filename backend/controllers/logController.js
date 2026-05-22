@@ -43,6 +43,74 @@ export const markComplete = async (req, res) => {
 
 
 
+export const unMarkComplete = async (req, res) => {
+
+    try {
+        const {habitId, date} = req.body;
+        const completedDate = date || todayKey();
+
+        await HabitLog.findOneAndDelete({
+            userId : req.user._id,
+            habitId,
+            completedDate
+        })
+        res.json({message: "Unmarked!"})
+        
+    } catch (error) {
+        res.status(500).json({message: `error from unMarkComplete: ${error}`})
+    }
+} 
+
+
+
+
+export const getToday = async (req, res) => {
+
+    try {
+        
+        const logs =await HabitLog.find({
+            userId : req.user._id,
+            completedDate: todayKey()
+        })
+        res.json(logs)
+    } catch (error) {
+        res.status(500).json({message: `error from getToday: ${error}`})
+    }
+} 
+
+
+
+
+export const getRange = async (req, res) => {
+
+    try {
+
+        const {start,end} = req.query;
+        const logs = await HabitLog.find({
+            userId : req.user._id,
+            completedDate: {$gte: start, $lte:end}  // Find dates between start and end
+        })
+        res.json(logs)
+    } catch (error) {
+        res.status(500).json({message: `error from getRange: ${error}`})
+    }
+} 
+
+
+
+// getHeatmap
+export const getHeatmap = async (req, res) => {
+
+    try {
+        
+    } catch (error) {
+        res.status(500).json({message: `error from getHeatmap: ${error}`})
+    }
+} 
+
+
+
+
 export const markComplete = async (req, res) => {
 
     try {
@@ -54,16 +122,6 @@ export const markComplete = async (req, res) => {
 
 
 
-export const markComplete = async (req, res) => {
-
-    try {
-        
-    } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
-    }
-} 
-
-
 
 export const markComplete = async (req, res) => {
 
@@ -74,38 +132,6 @@ export const markComplete = async (req, res) => {
     }
 } 
 
-
-
-export const markComplete = async (req, res) => {
-
-    try {
-        
-    } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
-    }
-} 
-
-
-
-export const markComplete = async (req, res) => {
-
-    try {
-        
-    } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
-    }
-} 
-
-
-
-export const markComplete = async (req, res) => {
-
-    try {
-        
-    } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
-    }
-} 
 
 
 
