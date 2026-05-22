@@ -133,7 +133,7 @@ export const archiveHabit = async (req, res) => {
 
 
 // REORDER HABITS 
-const reorderHabits = async (req, res) => {
+export const reorderHabits = async (req, res) => {
     try {
         const {order} = req.body;   // array of habit ids
         if(!Array.isArray(order)) {
@@ -161,6 +161,6 @@ const reorderHabits = async (req, res) => {
     }
 }
 
-//habit controller
+
 
 

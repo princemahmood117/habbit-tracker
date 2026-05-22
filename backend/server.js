@@ -4,6 +4,7 @@ import cors from "cors";
 import {connectDB} from './config/db.js'
 import {notFound,errorHandler} from './middleware/errorHandler.js'
 import authRoutes from "./routes/auth.js";
+import habitRoutes from "./routes/habits.js";
 
 
 
@@ -47,6 +48,7 @@ app.get('/api/health', (req, res) => {
 
 
 app.use("/api/auth", authRoutes)
+app.use("/api/habits", habitRoutes)
 
 
 
@@ -63,3 +65,14 @@ connectDB().then(() => {
         console.log(`Server is running on port: https:localhost:${PORT}`);
     })
 })
+
+
+// {
+//     "name" : "Drink 2L of water",
+//     "description" : "Stay hydrated throughout the day",
+//     "category" : "Health",
+//     "frequency" : "daily",
+//     "color" : "#0ea5e9",
+//     "icon" : "💧",
+
+// }
