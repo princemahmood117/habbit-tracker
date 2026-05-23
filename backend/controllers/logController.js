@@ -189,7 +189,7 @@ export const getAllStats = async (req, res) => {
         const perHabit = habits.map((h) => {
             const hLogs = logs.filter((l) => String(l.habitId) === String(h._id));
             const keys = hLogs.map((l) => l.completedDate).sort().reverse();
-            const {curent, longest} = calcStreak(keys)
+            const {current, longest} = calcStreak(keys)
 
             return {
                 habitId: h._id,
@@ -202,11 +202,11 @@ export const getAllStats = async (req, res) => {
                 longestStreak: longest,
             }
         })
-        req.json({perHabit, days})
+        res.json({perHabit, days})
     } catch (error) {
         res.status(500).json({message: `error from getAllStats: ${error}`})
     }
-} 
+}
 
 
 
