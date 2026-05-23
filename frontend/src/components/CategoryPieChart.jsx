@@ -61,7 +61,7 @@ export default function CategoryPieChart({ data }) {
               <Legend
                 wrapperStyle={{
                   fontSize: 12,
-                  color: theme === "dark" ? "#b8b8c8" : "#4e4e59",
+                  color: theme === "dark" ? "#ffffff" : "#4e4e59",
                 }}
                 iconType="circle"
                 iconSize={8}
