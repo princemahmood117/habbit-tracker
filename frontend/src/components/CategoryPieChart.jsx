@@ -45,7 +45,7 @@ export default function CategoryPieChart({ data }) {
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
+              {/* <Tooltip
                 contentStyle={{
                   background:
                     theme === "dark" ? "rgba(20,20,36,0.95)" : "rgba(255,255,255,0.95)",
@@ -58,12 +58,34 @@ export default function CategoryPieChart({ data }) {
                   // color: theme === "dark" ? "#ebebf5" : "#13131b",
                   backdropFilter: "blur(12px)",
                 }}
+              /> */}
+              <Tooltip
+                contentStyle={{
+                  background:
+                    theme === "dark"
+                      ? "rgba(20,20,36,0.95)"
+                      : "rgba(255,255,255,0.95)",
+                  border: `1px solid ${
+                    theme === "dark"
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(15,15,27,0.08)"
+                  }`,
+                  borderRadius: 12,
+                  fontSize: 12,
+                  backdropFilter: "blur(12px)",
+                }}
+                labelStyle={{
+                  color: theme === "dark" ? "#ffffff" : "#13131b",
+                }}
+                itemStyle={{
+                  color: theme === "dark" ? "#ffffff" : "#13131b",
+                }}
               />
               <Legend
                 wrapperStyle={{
                   fontSize: 12,
-                  // color: theme === "dark" ? "#ffffff" : "#4e4e59",
-                  color: theme === "dark" ? "#b8b8c8" : "#4e4e59",
+                  color: theme === "dark" ? "#ffffff" : "#4e4e59",
+                  // color: theme === "dark" ? "#b8b8c8" : "#4e4e59",
                 }}
                 iconType="circle"
                 iconSize={8}
