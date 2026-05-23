@@ -2,7 +2,7 @@ import AiInsight from "../models/AiInsight.js";
 import Habit from "../models/Habit.js"
 import HabitLog from "../models/HabitLog.js"
 import { chatCompletion, SYSTEM_PROMPTS } from "../utils/aiService.js";
-import { calcStreak, lastNDays } from "../utils/dateHelpers.js"
+import { calcStreak, lastNDays, todayKey } from "../utils/dateHelpers.js"
 
 const buildWeeklyContext = async (userId) => {
     const habits = await Habit.find({
@@ -169,7 +169,7 @@ export const recoveryPlan = async(req, res) => {
 
 
 
-const chatAnalysis = async (req, res) => {
+export const chatAnalysis = async (req, res) => {
     try {
         const {question} = req.body;
         if(!question) {
@@ -216,5 +216,58 @@ const chatAnalysis = async (req, res) => {
         
     } catch (error) {
         res.status(500).json({message: `error from chatAnalysis: ${error.message}`})
+    }
+};
+
+
+
+
+export const morningMotivation = async(req, res) =>{
+    try {
+        const habits = await Habit.find({
+            userId: req.user._id,
+            isArchived: false,
+        })
+
+        if(!habits.length) {
+            return res.json({
+                content: "Good morning! Add your first habit today and let's get the momentum started."
+            })
+        }
+
+        const days = lastNDays(30);
+        const logs = await HabitLog.find({
+            userId: req.user._id,
+            completedDate: {$gte: days[0], $lte: days[days.length - 1]}
+        })
+
+        const ctx = habits.map((h) => {
+            const hLogs = logs.filter((l) => String(l.habitId) === String(h._id)).map((l) => l.completedDate).sort().reverse();
+            const {current} = calcStreak(hLogs);
+            return `${h.name}: current streak ${current}`            
+        }).join("\n");
+
+        const today = todayKey();
+        const todayLogs = logs.filter((l) => l.completedDate === today);
+        const done = todayLogs.length;
+        const total = habits.length;
+
+        const userMsg = `Todays's habit and streak:\n${ctx}\n\nDone today: ${done}/${total}. Write the morning motivation now.`;
+
+        const {content} = await chatCompletion({
+            system: SYSTEM_PROMPTS.morning,
+            user: userMsg,
+            temperature: 0.8,
+        })
+
+        await AiInsight.create({
+            userId: req.user._id,
+            type: "morning",
+            content,
+        })
+        res.json({content});
+        
+    } catch (error) {
+        res.status(500).json({message: `error from morningMotivation: ${error.message}`})
     }
 }

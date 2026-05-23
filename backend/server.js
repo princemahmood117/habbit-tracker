@@ -6,6 +6,7 @@ import {notFound,errorHandler} from './middleware/errorHandler.js'
 import authRoutes from "./routes/auth.js";
 import habitRoutes from "./routes/habits.js";
 import logRoutes from "./routes/logs.js";
+import aiRoutes from "./routes/ai.js";
 
 
 
@@ -51,6 +52,9 @@ app.get('/api/health', (req, res) => {
 app.use("/api/auth", authRoutes)
 app.use("/api/habits", habitRoutes)
 app.use("/api/logs", logRoutes)
+app.use("/api/ai", aiRoutes)
+
+
 
 
 
@@ -70,11 +74,8 @@ connectDB().then(() => {
 
 
 // {
-//     "name" : "Drink 2L of water",
-//     "description" : "Stay hydrated throughout the day",
-//     "category" : "Health",
-//     "frequency" : "daily",
-//     "color" : "#0ea5e9",
-//     "icon" : "💧",
+//     "goals" : "Build a stronger fitness routine and read more books",
+//     "productiveTime" : "Early mornings before work",
+//     "struggles" : "Late-night journaling and weekend gym session."
 
 // }
