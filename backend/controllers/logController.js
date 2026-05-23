@@ -1,6 +1,6 @@
 import Habit from "../models/Habit.js";
 import HabitLog from "../models/HabitLog.js";
-import { todayKey } from "../utils/dateHelpers.js";
+import { calcStreak, last90Days, lastNDays, todayKey } from "../utils/dateHelpers.js";
 
 
 export const markComplete = async (req, res) => {
@@ -14,7 +14,7 @@ export const markComplete = async (req, res) => {
         })
 
         if(!habit) {
-            res.status(404).json({message: `Habit not found!`})
+            res.status(404).json({message: `Habit not found to mark complete!`})
         }
         const log = await HabitLog.findOneAndUpdate({
             userId: req.user._id,
@@ -103,6 +103,17 @@ export const getHeatmap = async (req, res) => {
 
     try {
         
+        const days = last90Days();
+        const logs =await HabitLog.find({
+            userId: req.user?._id,
+            completedDate: {$gte: days[0], $lte: days[days.length - 1]},
+        })
+        const counts = {};
+        for(const d of days) counts[d] = 0;
+        for(const l of logs) counts[l.completedDate] = (counts[l.completedDate] || 0) + 1;
+        const data = days.map((d) => ({date:d, count:counts[d] || 0}));
+        res.json(data)
+
     } catch (error) {
         res.status(500).json({message: `error from getHeatmap: ${error}`})
     }
@@ -111,37 +122,92 @@ export const getHeatmap = async (req, res) => {
 
 
 
-export const markComplete = async (req, res) => {
+export const getHabitStats = async (req, res) => {
 
     try {
+        const habit = await Habit.findOne({
+            _id: req.params.habitId,
+            userId: req.user?._id,
+        })
+        if(!habit) {
+            res.status(500).json({message: `Habit not found for stats!`})
+        }
+
+        const logs = await HabitLog.find({
+            userId: req.user?._id,
+            habitId: habit._id,
+        }).sort({completedDate: -1 });
+
+        const dateKeys = logs.map((l) => l.completedDate);
+        const {current, longest} = calcStreak(dateKeys);
+
+        // completio rate since habit created
+        const createdKey = habit.createdAt.toISOString().slice(0,10);
+        const today = todayKey();
+        const start = new Date(createdKey);
+        const end = new Date(today);
+        const totalDays = Math.max(1, Math.round((end-start) / (1000*60*60*24))) + 1;
+        const completionRate = Math.round((logs.length / totalDays) * 100);
+
+        // monthly breakdown
+        const monthly = {};
+        for(const l of logs) {
+            const m = l.completedDate.slice(0,7);
+            monthly[m] = (monthly[m] || 0) + 1;
+        }
         
+        res.json({
+            habit,
+            totalCompletions : logs.length,
+            currentStreak: current,
+            longestStreak: longest,
+            completionRate,
+            monthly            
+        });
     } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
+        res.status(500).json({message: `error from getHabitStats: ${error}`})
     }
 } 
 
 
 
 
-export const markComplete = async (req, res) => {
+export const getAllStats = async (req, res) => {
 
     try {
         
+        const habits = await Habit.find({
+            userId: req.user?._id,
+            isArchived: false,
+        }) 
+        const days = lastNDays(30);
+        const logs = await HabitLog.find({
+            userId: req.user?._id,
+            completedDate: {$gte: days[0], $lte: days[days.length - 1]},
+        })
+
+        const perHabit = habits.map((h) => {
+            const hLogs = logs.filter((l) => String(l.habitId) === String(h._id));
+            const keys = hLogs.map((l) => l.completedDate).sort().reverse();
+            const {curent, longest} = calcStreak(keys)
+
+            return {
+                habitId: h._id,
+                name: h.name,
+                icon: h.icon,
+                color: h.color,
+                category: h.category,
+                completions30d: hLogs.length,
+                currentStreak: current,
+                longestStreak: longest,
+            }
+        })
+        req.json({perHabit, days})
     } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
+        res.status(500).json({message: `error from getAllStats: ${error}`})
     }
 } 
 
 
-
-
-export const markComplete = async (req, res) => {
-
-    try {
-        
-    } catch (error) {
-        res.status(500).json({message: `error from markComplete: ${error}`})
-    }
-} 
 
 
